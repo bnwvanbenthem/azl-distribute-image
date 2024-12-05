@@ -2,7 +2,7 @@
 export CUSTOM_LOCATION='hci-659-mix-y01'
 
 export IMAGE_NAME='dummy-image-bvb'
-export IMAGE_PATH='C:\\bvb\\dummy.vhd'
+export IMAGE_PATH='C:\bvb\dummy.vhd'
 export SUBSCRIPTION='d38b5566-1cb7-411a-95ac-e94507237470'
 export RESOURCE_GROUP='rg-azhci-infraape-01'
 export STORAGE_CONTAINER='Volume1'
