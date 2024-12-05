@@ -6,7 +6,8 @@ use std::error::Error;
 #[derive(Serialize)]
 struct ImageUploadRequest {
     location: String,
-    extendedLocation: ExtendedLocation,
+    #[serde(rename = "extendedLocation")]
+    extended_location: ExtendedLocation,
     properties: Properties,
 }
 
@@ -18,9 +19,12 @@ struct ExtendedLocation {
 
 #[derive(Serialize)]
 struct Properties {
-    imagePath: String,
-    containerId: String,
-    osType: String,
+    #[serde(rename = "imagePath")]
+    image_path: String,
+    #[serde(rename = "containerId")]
+    container_id: String,
+    #[serde(rename = "osType")]
+    os_type: String,
 }
 
 #[tokio::main]
@@ -98,14 +102,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Create the request body
     let request_body = ImageUploadRequest {
         location: location.clone(),
-        extendedLocation: ExtendedLocation {
+        extended_location: ExtendedLocation {
             r#type: "CustomLocation".to_string(),
             name: extended_location_name.clone(),
         },
         properties: Properties {
-            imagePath: image_path.clone(),
-            containerId: container_id.clone(),
-            osType: os_type.clone(),
+            image_path: image_path.clone(),
+            container_id: container_id.clone(),
+            os_type: os_type.clone(),
         },
     };
 
