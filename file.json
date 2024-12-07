@@ -1,0 +1,26 @@
+Response {
+    url: "https://management.azure.com/subscriptions/d38b5566-1cb7-411a-95ac-e94507237470/resourceGroups/rg-azhci-infraape-01/providers/Microsoft.AzureStackHCI/galleryImages/dummy-image-bvb?api-version=2024-01-01",
+    status: 201,
+    headers: {
+        "cache-control": "no-cache",
+        "pragma": "no-cache",
+        "content-length": "1185",
+        "content-type": "application/json; charset=utf-8",
+        "expires": "-1",
+        "etag": "\"670005e4-0000-0d00-0000-6752eabe0000\"",
+        "x-ms-ratelimit-remaining-subscription-writes": "199",
+        "x-ms-providerhub-traffic": "True",
+        "mise-correlation-id": "09e62f51-adf1-4b90-b7d3-4cc0f998c03d",
+        "x-ms-request-id": "1eb6b864-73ce-4268-8085-2f09826296b1",
+        "x-ms-correlation-request-id": "ff6f9b0d-cd1d-406e-8e7d-332398140785",
+        "x-azure-ref": "20241206T121454Z-1745bf69f6btk2dkhC1AMSugdn00000002ug0000000048z4",
+        "x-cache": "CONFIG_NOCACHE",
+        "azure-asyncoperation": "https://management.azure.com/providers/Microsoft.AzureStackHCI/locations/WESTEUROPE/operationStatuses/244ba6fb-677a-49d5-876c-75ca7855f5d9?api-version=2024-01-01&t=638690840944319285",
+        "x-ms-ratelimit-remaining-subscription-global-writes": "2999",
+        "x-ms-routing-request-id": "WESTEUROPE:20241206T121454Z:ff6f9b0d-cd1d-406e-8e7d-332398140785",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "x-content-type-options": "nosniff",
+        "x-msedge-ref": "Ref A: 3DF637C8638C4C87928D24D68540D02C Ref B: DB3EDGE3220 Ref C: 2024-12-06T12:14:52Z",
+        "date": "Fri, 06 Dec 2024 12:14:53 GMT"
+    }
+}

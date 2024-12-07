@@ -19,4 +19,5 @@ cargo run -- --token $TOKEN \
     --extended-location-name "/subscriptions/$SUBSCRIPTION/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.ExtendedLocation/customLocations/$CUSTOM_LOCATION" \
     --subscription $SUBSCRIPTION \
     --resource-group $RESOURCE_GROUP \
-    --os-type $OS_TYPE
+    --os-type $OS_TYPE \
+    #--overwrite

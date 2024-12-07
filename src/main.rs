@@ -1,6 +1,6 @@
 use clap::{Arg, Command};
 use reqwest::Client;
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 use std::error::Error;
 
 #[derive(Serialize)]
@@ -26,6 +26,22 @@ struct Properties {
     #[serde(rename = "osType")]
     os_type: String,
 }
+
+#[derive(Debug, Serialize)]
+struct AsyncOperation {
+    url: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct GalleryImage {
+    name: String, // Only capture the "name" field
+}
+
+#[derive(Debug, Deserialize)]
+struct GalleryResponse {
+    value: Vec<GalleryImage>, // The "value" array contains the gallery images
+}
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -86,6 +102,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .required(true)
                 .help("Linux or Windows"),
         )
+        .arg(
+            Arg::new("overwrite")
+                .long("overwrite")
+                .help("Overwrite existing gallery images")
+                .action(clap::ArgAction::SetTrue),
+        )
         .get_matches();
 
     // Extract values from arguments using `get_one`
@@ -98,7 +120,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let resource_group = matches.get_one::<String>("resource-group").unwrap();
     let image_name = matches.get_one::<String>("image-name").unwrap();
     let os_type = matches.get_one::<String>("os-type").unwrap();
+    let overwrite = matches.get_one::<bool>("overwrite").unwrap();
 
+    
+    // Create a reqwest client
+    let client = Client::new();
+    
+    // list images and check if the image exists
+    let images = list_images(client, token, subscription, resource_group).await?;
+    let image_exists = images.iter().any(|image| image == image_name);
+    println!("{}", image_exists);
+    
+
+    /*
     // Create the request body
     let request_body = ImageUploadRequest {
         location: location.clone(),
@@ -139,6 +173,44 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let error_text = response.text().await?;
         eprintln!("Failed to upload image: {}", error_text);
     }
+    */
 
     Ok(())
+}
+
+async fn list_images(client: Client, token: &str, subscription: &str, resource_group: &str) -> Result<Vec<String>, Box<dyn Error>> {
+
+// check existing images
+let url = format!(
+    "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
+    subscription, 
+    resource_group, 
+);
+
+let mut images: Vec<String> = Vec::new();
+
+// Send the PUT request with the Authorization token
+let response = client
+    .get(&url)
+    .header("Authorization", format!("Bearer {}", token))
+    .send()
+    .await?;
+
+// Ensure the request was successful
+if response.status().is_success() {
+    // Deserialize the response body into the GalleryResponse struct
+    let body: GalleryResponse = response.json().await?;
+    
+    // Print the names of all gallery images
+    for image in body.value {
+        images.push(image.name);
+    }
+} else {
+    // If the request failed, print the status and error
+    eprintln!("Request failed. Status: {}", response.status());
+    let error_text = response.text().await?;
+    eprintln!("Error body: {}", error_text);
+}
+
+    Ok(images)
 }
