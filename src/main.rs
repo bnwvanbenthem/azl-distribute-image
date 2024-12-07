@@ -1,5 +1,5 @@
 use clap::{Arg, Command};
-use reqwest::Client;
+use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
@@ -25,11 +25,6 @@ struct Properties {
     container_id: String,
     #[serde(rename = "osType")]
     os_type: String,
-}
-
-#[derive(Debug, Serialize)]
-struct AsyncOperation {
-    url: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -159,7 +154,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // upload images if it doesn`t exist in the gallery
     // or the overwrite parameter is given
     if !image_exists || config.overwrite == true {
-        upload_image(client.clone(), &config).await?;
+        let operation = upload_image(client.clone(), &config).await?;
+        println!("{:?}", operation.status().as_str());
     } else {
         println!("Gallery Image exists, no overwrite requested");
     }
@@ -202,7 +198,7 @@ async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box
     Ok(images)
 }
 
-async fn upload_image(client: Client, config: &Config) -> Result<(), Box<dyn Error>> {
+async fn upload_image(client: Client, config: &Config) -> Result<Response, Box<dyn Error>> {
     // Create the request body
     let request_body = ImageUploadRequest {
         location: config.location.clone(),
@@ -241,5 +237,5 @@ async fn upload_image(client: Client, config: &Config) -> Result<(), Box<dyn Err
         return Err(format!("Failed to upload image: {}", error_text).into());
     }
 
-    Ok(())
+    Ok(response)
 }

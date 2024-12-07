@@ -20,4 +20,4 @@ cargo run -- --token $TOKEN \
     --subscription $SUBSCRIPTION \
     --resource-group $RESOURCE_GROUP \
     --os-type $OS_TYPE \
-    #--overwrite
+    --overwrite
