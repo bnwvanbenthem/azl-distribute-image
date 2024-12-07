@@ -153,6 +153,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // list images and check if the image exists
     let images = list_images(client.clone(), &config).await?;
+     // check existing images
     let image_exists = images.iter().any(|image| *image == config.image_name);
 
     // upload images if it doesn`t exist in the gallery
@@ -167,7 +168,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box<dyn Error>> {
-    // check existing images
+    // Build the URL for the Azure REST API endpoint
     let url = format!(
     "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
     config.subscription,
