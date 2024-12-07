@@ -148,14 +148,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // list images and check if the image exists
     let images = list_images(client.clone(), &config).await?;
-     // check existing images
+    // check existing images
     let image_exists = images.iter().any(|image| *image == config.image_name);
 
     // upload images if it doesn`t exist in the gallery
     // or the overwrite parameter is given
     if !image_exists || config.overwrite == true {
         let operation = upload_image(client.clone(), &config).await?;
-        println!("{:?}", operation.status().as_str());
+
+        // Access a specific header value by name
+        if let Some(header_value) = operation.headers().get("azure-asyncoperation") {
+            // Optionally, you can convert it to a string
+            if let Ok(header_str) = header_value.to_str() {
+                println!("{}", header_str);
+            }
+        } else {
+            eprintln!("Header 'azure-asyncoperation' not found.");
+        }
+
     } else {
         println!("Gallery Image exists, no overwrite requested");
     }
