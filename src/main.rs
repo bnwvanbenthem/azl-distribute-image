@@ -152,52 +152,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = Client::new();
 
     // list images and check if the image exists
-    let images = list_images(client, &config).await?;
+    let images = list_images(client.clone(), &config).await?;
     let image_exists = images.iter().any(|image| *image == config.image_name);
 
     // upload images if it doesn`t exist in the gallery
     // or the overwrite parameter is given
     if !image_exists || config.overwrite == true {
-        // Create the request body
-        let request_body = ImageUploadRequest {
-            location: config.location.clone(),
-            extended_location: ExtendedLocation {
-                r#type: "CustomLocation".to_string(),
-                name: config.extended_location_name.clone(),
-            },
-            properties: Properties {
-                image_path: config.image_path.clone(),
-                container_id: config.container_id.clone(),
-                os_type: config.os_type.clone(),
-            },
-        };
-
-        // Build the URL for the Azure REST API endpoint
-        let url = format!(
-        "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version=2024-01-01",
-        config.subscription,
-        config.resource_group,
-        config.image_name
-    );
-
-        // Create a reqwest client
-        let client = Client::new();
-
-        // Send the PUT request with the Authorization token
-        let response = client
-            .put(&url)
-            .header("Authorization", format!("Bearer {}", config.token))
-            .json(&request_body)
-            .send()
-            .await?;
-
-        // Check if the request was successful
-        if response.status().is_success() {
-            println!("Image upload successful.");
-        } else {
-            let error_text = response.text().await?;
-            eprintln!("Failed to upload image: {}", error_text);
-        }
+        upload_image(client.clone(), &config).await?;
     } else {
         println!("Gallery Image exists, no overwrite requested");
     }
@@ -240,4 +201,44 @@ async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box
     Ok(images)
 }
 
-async fn upload_image(client: Client, config: &Config) -> Result<(), Box<dyn Error>> {}
+async fn upload_image(client: Client, config: &Config) -> Result<(), Box<dyn Error>> {
+    // Create the request body
+    let request_body = ImageUploadRequest {
+        location: config.location.clone(),
+        extended_location: ExtendedLocation {
+            r#type: "CustomLocation".to_string(),
+            name: config.extended_location_name.clone(),
+        },
+        properties: Properties {
+            image_path: config.image_path.clone(),
+            container_id: config.container_id.clone(),
+            os_type: config.os_type.clone(),
+        },
+    };
+
+    // Build the URL for the Azure REST API endpoint
+    let url = format!(
+        "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version=2024-01-01",
+        config.subscription,
+        config.resource_group,
+        config.image_name
+        );
+
+    // Send the PUT request with the Authorization token
+    let response = client
+        .put(&url)
+        .header("Authorization", format!("Bearer {}", config.token))
+        .json(&request_body)
+        .send()
+        .await?;
+
+    // Check if the request was successful
+    if response.status().is_success() {
+        println!("Request for Image upload is successful.");
+    } else {
+        let error_text = response.text().await?;
+        return Err(format!("Failed to upload image: {}", error_text).into());
+    }
+
+    Ok(())
+}
