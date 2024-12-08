@@ -3,10 +3,9 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, error::Error};
 
-
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct StorageContainers {
-    pub value: Vec<StorageContainer>
+    pub value: Vec<StorageContainer>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,6 +30,12 @@ pub struct Properties {
     #[serde(rename = "provisioningState")]
     pub provisioning_state: String,
     pub path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StorageLocation {
+    pub cluster: String,
+    pub container_id: String,
 }
 
 pub async fn list_storage_containers(
@@ -59,7 +64,6 @@ pub async fn list_storage_containers(
         for container in body.value {
             containers.push(container);
         }
-
     } else {
         // If the request failed, return the status and error
         let error_text = response.text().await?;
@@ -69,17 +73,28 @@ pub async fn list_storage_containers(
     Ok(containers)
 }
 
-pub async fn get_unique_storage_locations(containers: Vec<StorageContainer>) -> Result<HashMap<String, String>, Box<dyn Error>> {
+pub async fn get_unique_storage_locations(
+    containers: Vec<StorageContainer>,
+) -> Result<Vec<StorageLocation>, Box<dyn Error>> {
+    let mut unique: HashMap<String, String> = HashMap::new();
 
-    let mut storage_locations: HashMap<String, String> = HashMap::new();
+    for container in &containers {
+        unique.insert(
+            container.extended_location.name.clone(),
+            container.id.clone(),
+        );
+    }
 
-    for container in containers {
-        // Insert some values with (location, container) pairs as keys.
-        // only unique extended location
-        storage_locations.insert(container.extended_location.name, container.name);
+    let mut storage_locations: Vec<StorageLocation> = Vec::new();
 
+    for (cluster, container_id) in unique {
+        let storage_location = StorageLocation {
+            cluster,
+            container_id,
+        };
+
+        storage_locations.push(storage_location);
     }
 
     Ok(storage_locations)
-
 }

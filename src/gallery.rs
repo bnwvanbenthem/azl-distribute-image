@@ -1,9 +1,11 @@
+use crate::storage::StorageLocation;
 use crate::Config;
+
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct ImageUploadRequest {
     location: String,
     #[serde(rename = "extendedLocation")]
@@ -11,7 +13,7 @@ struct ImageUploadRequest {
     properties: Properties,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct Properties {
     #[serde(rename = "imagePath")]
     image_path: String,
@@ -21,7 +23,7 @@ struct Properties {
     os_type: String,
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 struct ExtendedLocation {
     r#type: String,
     name: String,
@@ -37,13 +39,14 @@ struct GalleryResponse {
     value: Vec<GalleryImage>, // The "value" array contains the gallery images
 }
 
+
 pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box<dyn Error>> {
+
     // Build the URL for the Azure REST API endpoint
     let url = format!(
-    "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
+    "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
     config.subscription,
-    config.resource_group,
-);
+    );
 
     let mut images: Vec<String> = Vec::new();
 
@@ -72,27 +75,45 @@ pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>,
     Ok(images)
 }
 
-pub async fn upload_image(client: Client, config: &Config) -> Result<Response, Box<dyn Error>> {
+pub async fn check_for_existing_images(image: String, storage_location: &StorageLocation) -> Result<bool, Box<dyn Error>> {
+
+
+
+
+    Ok(false)
+}
+
+
+
+pub async fn upload_image(
+    client: Client,
+    config: &Config,
+    storage_location: &StorageLocation,
+) -> Result<Response, Box<dyn Error>> {
     // Create the request body
     let request_body = ImageUploadRequest {
         location: config.location.clone(),
         extended_location: ExtendedLocation {
             r#type: "CustomLocation".to_string(),
-            name: config.extended_location_name.clone(),
+            name: storage_location.cluster.clone(),
         },
         properties: Properties {
             image_path: config.image_path.clone(),
-            container_id: config.container_id.clone(),
+            container_id: storage_location.container_id.clone(),
             os_type: config.os_type.clone(),
         },
     };
 
+    let resource_group = extract_resource_group(&storage_location.cluster).unwrap_or_default();
+    let cluster_name = extract_cluster_name(&storage_location.cluster).unwrap_or_default();
+
+    let image_name = format!("{}--{}", cluster_name, config.image_name);
     // Build the URL for the Azure REST API endpoint
     let url = format!(
         "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version=2024-01-01",
         config.subscription,
-        config.resource_group,
-        config.image_name
+        resource_group,
+        image_name,
         );
 
     // Send the PUT request with the Authorization token
@@ -112,4 +133,40 @@ pub async fn upload_image(client: Client, config: &Config) -> Result<Response, B
     }
 
     Ok(response)
+}
+
+fn extract_resource_group(resource_id: &str) -> Option<String> {
+    // Split the resource ID into parts by '/'
+    let parts: Vec<&str> = resource_id.split('/').collect();
+
+    // Find the index of "resourcegroups" in the parts
+    if let Some(index) = parts
+        .iter()
+        .position(|&part| part.eq_ignore_ascii_case("resourcegroups"))
+    {
+        // The resource group name follows "resourcegroups"
+        if index + 1 < parts.len() {
+            return Some(parts[index + 1].to_string());
+        }
+    }
+    // Return None if no resource group was found
+    None
+}
+
+fn extract_cluster_name(resource_id: &str) -> Option<String> {
+    // Split the resource ID into parts by '/'
+    let parts: Vec<&str> = resource_id.split('/').collect();
+
+    // Find the index of "customlocations" in the parts
+    if let Some(index) = parts
+        .iter()
+        .position(|&part| part.eq_ignore_ascii_case("customlocations"))
+    {
+        // The cluster name follows "customlocations"
+        if index + 1 < parts.len() {
+            return Some(parts[index + 1].to_string());
+        }
+    }
+    // Return None if no cluster name was found
+    None
 }

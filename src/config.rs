@@ -4,11 +4,8 @@ use clap::{Arg, Command};
 pub struct Config {
     pub token: String,
     pub image_path: String,
-    pub container_id: String,
     pub location: String,
-    pub extended_location_name: String,
     pub subscription: String,
-    pub resource_group: String,
     pub image_name: String,
     pub os_type: String,
     pub overwrite: bool,
@@ -32,34 +29,16 @@ impl Config {
                     .help("The path to the image file to upload"),
             )
             .arg(
-                Arg::new("container-id")
-                    .long("container-id")
-                    .required(true)
-                    .help("The container ID for the storage container"),
-            )
-            .arg(
                 Arg::new("location")
                     .long("location")
                     .required(true)
                     .help("Azure region location for the gallery image"),
             )
             .arg(
-                Arg::new("extended-location-name")
-                    .long("extended-location-name")
-                    .required(true)
-                    .help("Name of the extended location"),
-            )
-            .arg(
                 Arg::new("subscription")
                     .long("subscription")
                     .required(true)
                     .help("Name of the subscription"),
-            )
-            .arg(
-                Arg::new("resource-group")
-                    .long("resource-group")
-                    .required(true)
-                    .help("Name of the resource_group"),
             )
             .arg(
                 Arg::new("image-name")
@@ -84,21 +63,9 @@ impl Config {
         let config = Config {
             token: matches.get_one::<String>("token").unwrap().to_string(),
             image_path: matches.get_one::<String>("image-path").unwrap().to_string(),
-            container_id: matches
-                .get_one::<String>("container-id")
-                .unwrap()
-                .to_string(),
             location: matches.get_one::<String>("location").unwrap().to_string(),
-            extended_location_name: matches
-                .get_one::<String>("extended-location-name")
-                .unwrap()
-                .to_string(),
             subscription: matches
                 .get_one::<String>("subscription")
-                .unwrap()
-                .to_string(),
-            resource_group: matches
-                .get_one::<String>("resource-group")
                 .unwrap()
                 .to_string(),
             image_name: matches.get_one::<String>("image-name").unwrap().to_string(),
