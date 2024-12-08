@@ -1,7 +1,7 @@
 use config::Config;
 use reqwest::Client;
-use storage::StorageLocation;
 use std::error::Error;
+use storage::StorageLocation;
 
 mod config;
 mod gallery;
@@ -45,7 +45,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn start_image_upload_req(client: Client, config: &Config, location: &StorageLocation) -> Result<(), Box<dyn Error>> {
+async fn start_image_upload_req(
+    client: Client,
+    config: &Config,
+    location: &StorageLocation,
+) -> Result<(), Box<dyn Error>> {
     let operation = gallery::upload_image(client.clone(), &config, &location).await?;
 
     // Access a specific header value by name

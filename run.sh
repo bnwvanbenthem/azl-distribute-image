@@ -1,3 +1,5 @@
+cargo fmt
+cargo build --release
 
 export IMAGE_NAME='dummy-image-bvb'
 export IMAGE_PATH='C:\bvb\dummy.vhd'
@@ -7,7 +9,7 @@ export OS_TYPE='Linux'
 
 export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
 
-cargo run -- --token $TOKEN \
+./target/release/push_image --token $TOKEN \
     --image-path $IMAGE_PATH \
     --image-name $IMAGE_NAME \
     --location $LOCATION \
