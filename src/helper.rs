@@ -36,7 +36,7 @@ pub fn extract_cluster_name(resource_id: &str) -> Option<String> {
     None
 }
 
-pub fn value_exists(value: &String, list_of_values: &Vec<String>) -> Result<bool, Box<dyn Error>>{
+pub fn value_exists(value: &String, list_of_values: &Vec<String>) -> Result<bool, Box<dyn Error>> {
     let mut value_exists = false;
 
     for item in list_of_values {

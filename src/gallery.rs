@@ -1,6 +1,6 @@
+use crate::helper;
 use crate::storage::StorageLocation;
 use crate::Config;
-use crate::helper;
 
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
@@ -40,9 +40,7 @@ struct GalleryResponse {
     value: Vec<GalleryImage>, // The "value" array contains the gallery images
 }
 
-
 pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box<dyn Error>> {
-
     // Build the URL for the Azure REST API endpoint
     let url = format!(
     "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
@@ -95,7 +93,8 @@ pub async fn upload_image(
         },
     };
 
-    let resource_group = helper::extract_resource_group(&storage_location.cluster).unwrap_or_default();
+    let resource_group =
+        helper::extract_resource_group(&storage_location.cluster).unwrap_or_default();
     let cluster_name = helper::extract_cluster_name(&storage_location.cluster).unwrap_or_default();
 
     let image_name = format!("{}--{}", cluster_name, config.image_name);
