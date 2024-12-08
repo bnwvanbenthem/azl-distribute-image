@@ -9,7 +9,7 @@ export OS_TYPE='Linux'
 
 export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
 
-./target/release/push_image --token $TOKEN \
+./target/release/azl-distribute-image --token $TOKEN \
     --image-path $IMAGE_PATH \
     --image-name $IMAGE_NAME \
     --location $LOCATION \
