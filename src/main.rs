@@ -5,6 +5,7 @@ use std::error::Error;
 mod config;
 mod gallery;
 mod storage;
+mod helper;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -22,18 +23,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     for location in storage_locations {
 
-        
-        let operation = gallery::upload_image(client.clone(), &config, &location).await?;
+        let cluster_name = helper::extract_cluster_name(&location.cluster).unwrap_or_default();
+        let image_name = format!("{}--{}", cluster_name, config.image_name.clone());
 
-        // Access a specific header value by name
-        if let Some(header_value) = operation.headers().get("azure-asyncoperation") {
-            // Optionally, you can convert it to a string
-            if let Ok(header_str) = header_value.to_str() {
-                let _ =  header_str;
-            }
+        let image_exists = helper::value_exists(&image_name, &images)?;
+
+        if image_exists == true {
+            println!("Image {} already exisists no overwrite instruction given", &image_name)
+        } else if image_exists == true && config.overwrite {
+
         } else {
-            eprintln!("Header 'azure-asyncoperation' not found.");
+            let operation = gallery::upload_image(client.clone(), &config, &location).await?;
+
+            // Access a specific header value by name
+            if let Some(header_value) = operation.headers().get("azure-asyncoperation") {
+                // Optionally, you can convert it to a string
+                if let Ok(header_str) = header_value.to_str() {
+                    let _ =  header_str;
+                }
+            } else {
+                eprintln!("Header 'azure-asyncoperation' not found.");
+            }
+    
         }
+
     }
 
     Ok(())

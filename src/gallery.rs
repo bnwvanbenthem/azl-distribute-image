@@ -1,5 +1,6 @@
 use crate::storage::StorageLocation;
 use crate::Config;
+use crate::helper;
 
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
@@ -75,16 +76,6 @@ pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>,
     Ok(images)
 }
 
-pub async fn check_for_existing_images(image: String, storage_location: &StorageLocation) -> Result<bool, Box<dyn Error>> {
-
-
-
-
-    Ok(false)
-}
-
-
-
 pub async fn upload_image(
     client: Client,
     config: &Config,
@@ -104,8 +95,8 @@ pub async fn upload_image(
         },
     };
 
-    let resource_group = extract_resource_group(&storage_location.cluster).unwrap_or_default();
-    let cluster_name = extract_cluster_name(&storage_location.cluster).unwrap_or_default();
+    let resource_group = helper::extract_resource_group(&storage_location.cluster).unwrap_or_default();
+    let cluster_name = helper::extract_cluster_name(&storage_location.cluster).unwrap_or_default();
 
     let image_name = format!("{}--{}", cluster_name, config.image_name);
     // Build the URL for the Azure REST API endpoint
@@ -133,40 +124,4 @@ pub async fn upload_image(
     }
 
     Ok(response)
-}
-
-fn extract_resource_group(resource_id: &str) -> Option<String> {
-    // Split the resource ID into parts by '/'
-    let parts: Vec<&str> = resource_id.split('/').collect();
-
-    // Find the index of "resourcegroups" in the parts
-    if let Some(index) = parts
-        .iter()
-        .position(|&part| part.eq_ignore_ascii_case("resourcegroups"))
-    {
-        // The resource group name follows "resourcegroups"
-        if index + 1 < parts.len() {
-            return Some(parts[index + 1].to_string());
-        }
-    }
-    // Return None if no resource group was found
-    None
-}
-
-fn extract_cluster_name(resource_id: &str) -> Option<String> {
-    // Split the resource ID into parts by '/'
-    let parts: Vec<&str> = resource_id.split('/').collect();
-
-    // Find the index of "customlocations" in the parts
-    if let Some(index) = parts
-        .iter()
-        .position(|&part| part.eq_ignore_ascii_case("customlocations"))
-    {
-        // The cluster name follows "customlocations"
-        if index + 1 < parts.len() {
-            return Some(parts[index + 1].to_string());
-        }
-    }
-    // Return None if no cluster name was found
-    None
 }
