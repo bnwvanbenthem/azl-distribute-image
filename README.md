@@ -1,4 +1,4 @@
 # azl-image-push
-Push Images to the Azure Local Image gallery
+Distribute a gallery image to all Azure Local clusters registered in a subscription.
 
 ![alt text](files/img.png)
