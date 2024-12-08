@@ -1,7 +1,7 @@
+use crate::Config;
 use reqwest::{Client, Response};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use crate::Config;
 
 #[derive(Serialize)]
 struct ImageUploadRequest {

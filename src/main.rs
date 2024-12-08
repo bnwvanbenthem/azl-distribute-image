@@ -4,14 +4,22 @@ use std::error::Error;
 
 mod config;
 mod gallery;
+mod storage;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-
     let config = Config::build();
 
     // Create a reqwest client
     let client = Client::new();
+
+    // list storage containers
+    let containers = storage::list_storage_containers(client.clone(), &config).await?;
+    let storage_locations = storage::get_unique_storage_locations(containers).await?;
+
+    for container in storage_locations.values() {
+        println!("{}", container);
+    }
 
     // list images and check if the image exists
     let images = gallery::list_images(client.clone(), &config).await?;
@@ -37,14 +45,4 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
-}
-
-struct StorageContainer {
-
-}
-
-async fn list_storage_containers(client: Client, config: &Config) -> Result<Vec<StorageContainer>, Box<dyn Error>> {
-    
-    
-    Ok(vec![StorageContainer{}])
 }
