@@ -1,3 +1,4 @@
+use crate::gallery::GalleryImage;
 use std::error::Error;
 
 pub fn extract_resource_group(resource_id: &str) -> Option<String> {
@@ -36,11 +37,18 @@ pub fn extract_cluster_name(resource_id: &str) -> Option<String> {
     None
 }
 
-pub fn value_exists(value: &String, list_of_values: &Vec<String>) -> Result<bool, Box<dyn Error>> {
+pub fn image_exists_on_cluster(
+    image_name: &String,
+    cluster: &String,
+    list_of_images: &Vec<GalleryImage>,
+) -> Result<bool, Box<dyn Error>> {
     let mut value_exists = false;
 
-    for item in list_of_values {
-        if *value == *item {
+    for item in list_of_images {
+        let cluster_name_from_list =
+            extract_cluster_name(&item.extended_location.name).unwrap_or_default();
+
+        if *image_name == *item.name && *cluster == cluster_name_from_list {
             value_exists = true;
         }
     }

@@ -24,15 +24,17 @@ struct Properties {
     os_type: String,
 }
 
-#[derive(Debug, Serialize)]
-struct ExtendedLocation {
-    r#type: String,
-    name: String,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExtendedLocation {
+    pub r#type: String,
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct GalleryImage {
-    name: String, // Only capture the "name" field
+pub struct GalleryImage {
+    pub name: String,
+    #[serde(rename = "extendedLocation")]
+    pub extended_location: ExtendedLocation,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,14 +42,17 @@ struct GalleryResponse {
     value: Vec<GalleryImage>, // The "value" array contains the gallery images
 }
 
-pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>, Box<dyn Error>> {
+pub async fn list_images(
+    client: Client,
+    config: &Config,
+) -> Result<Vec<GalleryImage>, Box<dyn Error>> {
     // Build the URL for the Azure REST API endpoint
     let url = format!(
     "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
     config.subscription,
     );
 
-    let mut images: Vec<String> = Vec::new();
+    let mut images: Vec<GalleryImage> = Vec::new();
 
     // Send the PUT request with the Authorization token
     let response = client
@@ -63,7 +68,7 @@ pub async fn list_images(client: Client, config: &Config) -> Result<Vec<String>,
 
         // Print the names of all gallery images
         for image in body.value {
-            images.push(image.name);
+            images.push(image);
         }
     } else {
         // If the request failed, return the status and error

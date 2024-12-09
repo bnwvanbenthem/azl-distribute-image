@@ -15,4 +15,4 @@ export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
     --location $LOCATION \
     --subscription $SUBSCRIPTION \
     --os-type $OS_TYPE \
-    --overwrite
+    #--overwrite

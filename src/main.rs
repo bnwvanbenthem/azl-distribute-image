@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let cluster_name = helper::extract_cluster_name(&location.cluster).unwrap_or_default();
         let image_name = format!("{}", config.image_name.clone());
 
-        let image_exists = helper::value_exists(&image_name, &images)?;
+        let image_exists = helper::image_exists_on_cluster(&image_name, &cluster_name, &images)?;
 
         if image_exists == true && !config.overwrite {
             println!(
