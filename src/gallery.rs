@@ -122,13 +122,13 @@ pub async fn upload_image(
     // Check if the request was successful
     if response.status().is_success() {
         println!(
-            "Request for Image upload is successful on cluster {}.",
+            "Request for Image upload is successful on cluster \"{}\".",
             cluster_name
         );
     } else {
         let error_text = response.text().await?;
         return Err(format!(
-            "Failed to upload image on cluster {} - {}",
+            "Failed to upload image on cluster \"{}\" - \"{}\"",
             cluster_name, error_text
         )
         .into());

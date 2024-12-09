@@ -30,14 +30,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
         if image_exists == true && !config.overwrite {
             println!(
-                "Image {} already exisists no overwrite instruction given",
-                &image_name
+                "Image \"{}\" already exisists on cluster \"{}\" no overwrite instruction given",
+                &image_name, &cluster_name,
             )
         } else if image_exists == true && config.overwrite {
-            println!("Uploading image {} on cluster {}", image_name, cluster_name);
+            println!(
+                "Uploading image \"{}\" on cluster \"{}\"",
+                image_name, cluster_name
+            );
             start_image_upload_req(client.clone(), &config, &location).await?;
         } else {
-            println!("Uploading image {} on cluster {}", image_name, cluster_name);
+            println!(
+                "Uploading image \"{}\" on cluster \"{}\"",
+                image_name, cluster_name
+            );
             start_image_upload_req(client.clone(), &config, &location).await?;
         }
     }
