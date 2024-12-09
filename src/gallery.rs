@@ -48,8 +48,9 @@ pub async fn list_images(
 ) -> Result<Vec<GalleryImage>, Box<dyn Error>> {
     // Build the URL for the Azure REST API endpoint
     let url = format!(
-    "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version=2024-01-01",
+    "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/galleryImages?api-version={}",
     config.subscription,
+    config.api_version,
     );
 
     let mut images: Vec<GalleryImage> = Vec::new();
@@ -105,10 +106,11 @@ pub async fn upload_image(
     let image_name = format!("{}", config.image_name);
     // Build the URL for the Azure REST API endpoint
     let url = format!(
-        "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version=2024-01-01",
+        "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version={}",
         config.subscription,
         resource_group,
         image_name,
+        config.api_version,
         );
 
     // Send the PUT request with the Authorization token

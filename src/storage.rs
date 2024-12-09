@@ -44,8 +44,9 @@ pub async fn list_storage_containers(
 ) -> Result<Vec<StorageContainer>, Box<dyn Error>> {
     // Build the URL for the Azure REST API endpoint
     let url = format!(
-            "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/storageContainers?api-version=2024-01-01",
+            "https://management.azure.com/subscriptions/{}/providers/Microsoft.AzureStackHCI/storageContainers?api-version={}",
             config.subscription,
+            config.api_version,
         );
 
     let mut containers: Vec<StorageContainer> = Vec::new();

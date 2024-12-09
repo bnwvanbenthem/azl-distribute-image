@@ -8,6 +8,7 @@ pub struct Config {
     pub subscription: String,
     pub image_name: String,
     pub os_type: String,
+    pub api_version: String,
     pub overwrite: bool,
 }
 
@@ -53,6 +54,11 @@ impl Config {
                     .help("Linux or Windows"),
             )
             .arg(
+                Arg::new("api-version")
+                    .long("api-version")
+                    .help("Set the Azure API version"),
+            )
+            .arg(
                 Arg::new("overwrite")
                     .long("overwrite")
                     .help("Overwrite existing gallery images")
@@ -70,6 +76,10 @@ impl Config {
                 .to_string(),
             image_name: matches.get_one::<String>("image-name").unwrap().to_string(),
             os_type: matches.get_one::<String>("os-type").unwrap().to_string(),
+            api_version: matches
+                .get_one::<String>("api-version")
+                .unwrap()
+                .to_string(),
             overwrite: *matches.get_one::<bool>("overwrite").unwrap(),
         };
 
