@@ -97,7 +97,7 @@ pub async fn upload_image(
         helper::extract_resource_group(&storage_location.cluster).unwrap_or_default();
     let cluster_name = helper::extract_cluster_name(&storage_location.cluster).unwrap_or_default();
 
-    let image_name = format!("{}--{}", cluster_name, config.image_name);
+    let image_name = format!("{}", config.image_name);
     // Build the URL for the Azure REST API endpoint
     let url = format!(
         "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.AzureStackHCI/galleryImages/{}?api-version=2024-01-01",
@@ -116,10 +116,17 @@ pub async fn upload_image(
 
     // Check if the request was successful
     if response.status().is_success() {
-        println!("Request for Image upload is successful.");
+        println!(
+            "Request for Image upload is successful on cluster {}.",
+            cluster_name
+        );
     } else {
         let error_text = response.text().await?;
-        return Err(format!("Failed to upload image: {}", error_text).into());
+        return Err(format!(
+            "Failed to upload image on cluster {} - {}",
+            cluster_name, error_text
+        )
+        .into());
     }
 
     Ok(response)

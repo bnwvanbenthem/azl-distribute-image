@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     for location in storage_locations {
         let cluster_name = helper::extract_cluster_name(&location.cluster).unwrap_or_default();
-        let image_name = format!("{}--{}", cluster_name, config.image_name.clone());
+        let image_name = format!("{}", config.image_name.clone());
 
         let image_exists = helper::value_exists(&image_name, &images)?;
 
@@ -34,10 +34,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 &image_name
             )
         } else if image_exists == true && config.overwrite {
-            println!("Uploading image {}", image_name);
+            println!("Uploading image {} on cluster {}", image_name, cluster_name);
             start_image_upload_req(client.clone(), &config, &location).await?;
         } else {
-            println!("Uploading image {}", image_name);
+            println!("Uploading image {} on cluster {}", image_name, cluster_name);
             start_image_upload_req(client.clone(), &config, &location).await?;
         }
     }
