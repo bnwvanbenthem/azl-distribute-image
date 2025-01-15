@@ -2,7 +2,7 @@ cargo fmt
 cargo build --release
 
 export IMAGE_NAME='dummy-image-bvb'
-export IMAGE_PATH='https://azlimgdistribute.blob.core.windows.net/images/dummy-image-bvb.vhd'
+export IMAGE_PATH=$(echo https://azlimgdistribute.blob.core.windows.net/images/$IMAGE_NAME.vhd)
 export SUBSCRIPTION='d38b5566-1cb7-411a-95ac-e94507237470'
 export LOCATION='westeurope'
 export OS_TYPE='Linux'
