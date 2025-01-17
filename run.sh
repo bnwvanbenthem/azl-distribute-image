@@ -12,15 +12,18 @@ echo "Staring Image Distribution"
 echo "--------------------------"
 
 # CONSTRUCT IMAGE URL
-export IMAGE_NAME='rhel9-basic-v1'
+#export IMAGE_NAME='rhel9-basic-v1'
+export IMAGE_NAME='rhel9-postgres-preinst-v1'
 export IMAGE_PATH=$(echo https://azlimgdistribute.blob.core.windows.net/images/$IMAGE_NAME.vhdx?$SAS_TOKEN)
+
+# GENERATE TOKEN FOR GALLERY ACCESS
+export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
 
 export SUBSCRIPTION='d38b5566-1cb7-411a-95ac-e94507237470'
 export LOCATION='westeurope'
 export OS_TYPE='Linux'
 export API_VERSION='2024-01-01'
 
-export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
 
 ./target/release/azl-distribute-image --token $TOKEN \
     --image-path $IMAGE_PATH \
