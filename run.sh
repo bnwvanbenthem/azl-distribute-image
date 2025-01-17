@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # BUILD DISPATCHER
 cargo fmt
 cargo build --release
@@ -11,19 +13,20 @@ echo ""
 echo "Staring Image Distribution"
 echo "--------------------------"
 
-# CONSTRUCT IMAGE URL
-#export IMAGE_NAME='rhel9-basic-v1'
-export IMAGE_NAME='rhel9-postgres-preinst-v1'
-export IMAGE_PATH=$(echo https://azlimgdistribute.blob.core.windows.net/images/$IMAGE_NAME.vhdx?$SAS_TOKEN)
-
 # GENERATE TOKEN FOR GALLERY ACCESS
 export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
-
+# GENERATE PARAMS
 export SUBSCRIPTION='d38b5566-1cb7-411a-95ac-e94507237470'
 export LOCATION='westeurope'
 export OS_TYPE='Linux'
 export API_VERSION='2024-01-01'
 
+# Define an array
+image_list=("rhel9-basic-v1" "rhel9-postgres-preinst-v1")
+# Loop through the array
+for image in "${image_list[@]}"; do
+  export IMAGE_NAME=$image
+  export IMAGE_PATH=$(echo https://azlimgdistribute.blob.core.windows.net/images/$IMAGE_NAME.vhdx?$SAS_TOKEN)
 
 ./target/release/azl-distribute-image --token $TOKEN \
     --image-path $IMAGE_PATH \
@@ -33,3 +36,4 @@ export API_VERSION='2024-01-01'
     --os-type $OS_TYPE \
     --api-version $API_VERSION \
     #--overwrite
+done
