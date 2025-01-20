@@ -4,6 +4,10 @@
 cargo fmt
 cargo build --release
 
+echo ""
+echo "Generate SAS token"
+echo "------------------"
+
 # GENERATE SAS TOKEN THAT IS VALID FOR 2 HOURS
 TOKEN_EXP=$(date -u -d '+2 hours' +"%Y-%m-%dT%H:%M:%SZ")
 SAS_TOKEN=$(az storage container generate-sas --account-name azlimgdistribute --name images --permissions r --expiry $TOKEN_EXP --https-only --output tsv)
