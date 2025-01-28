@@ -9,6 +9,10 @@ Distribute a gallery image to all Azure Local clusters registered in a subscript
 cargo fmt
 cargo build --release
 
+echo ""
+echo "Generate SAS token"
+echo "------------------"
+
 # GENERATE SAS TOKEN THAT IS VALID FOR 2 HOURS
 TOKEN_EXP=$(date -u -d '+2 hours' +"%Y-%m-%dT%H:%M:%SZ")
 SAS_TOKEN=$(az storage container generate-sas --account-name azlimgdistribute --name images --permissions r --expiry $TOKEN_EXP --https-only --output tsv)
@@ -20,14 +24,10 @@ echo "--------------------------"
 
 # GENERATE TOKEN FOR GALLERY ACCESS
 export TOKEN=$(az account get-access-token --query "accessToken" --output tsv)
-# GENERATE PARAMS
-export SUBSCRIPTION='d38b5566-1cb7-411a-95ac-e94507237470'
-export LOCATION='westeurope'
-export OS_TYPE='Linux'
-export API_VERSION='2024-01-01'
 
-# Define an array
-image_list=("rhel9-basic-v1" "rhel9-postgres-preinst-v1")
+# Import parameters
+source .env
+
 # Loop through the array
 for image in "${image_list[@]}"; do
   export IMAGE_NAME=$image
